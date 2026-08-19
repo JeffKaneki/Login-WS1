@@ -215,3 +215,18 @@ button {
 .logout-btn:hover {
     background-color: #ff5252;
 }
+
+.button-container button,
+.button-container .button-link {
+    margin: 0 5px;
+}
+
+.form-message {
+    min-height: 1.5em;
+    text-align: center;
+    margin-top: 12px;
+    font-size: 14px;
+}
+
+.error-message { color: #ff6b6b; }
+.success-message { color: #8ee28e; }
