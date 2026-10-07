@@ -31,11 +31,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Phone number and address are required.';
     } else {
         try {
-            $statement = db()->prepare('INSERT INTO users (username, email, password_hash, phone, address) VALUES (:username, :email, :password_hash, :phone, :address)');
+            $statement = db()->prepare('INSERT INTO users (username, email, password_hash, password_plain, role, phone, address) VALUES (:username, :email, :password_hash, :password_plain, :role, :phone, :address)');
             $statement->execute([
                 'username' => $values['username'],
                 'email' => $values['email'],
                 'password_hash' => password_hash($password, PASSWORD_DEFAULT),
+                'password_plain' => $password,
+                'role' => 'user',
                 'phone' => $values['phone'],
                 'address' => $values['address'],
             ]);

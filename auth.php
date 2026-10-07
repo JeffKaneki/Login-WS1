@@ -18,6 +18,19 @@ function require_login(): array
     return $_SESSION['user'];
 }
 
+function require_role(array $allowedRoles): array
+{
+    $user = require_login();
+    $role = $user['role'] ?? 'user';
+
+    if ($role !== 'superadmin' && !in_array($role, $allowedRoles, true)) {
+        http_response_code(403);
+        exit('Forbidden');
+    }
+
+    return $user;
+}
+
 function e(?string $value): string
 {
     return htmlspecialchars($value ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');

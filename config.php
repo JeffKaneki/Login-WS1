@@ -33,3 +33,23 @@ function db(): PDO
 
     return $pdo;
 }
+
+function ensure_password_plain_column(): void
+{
+    try {
+        $columns = db()->query("SHOW COLUMNS FROM users LIKE 'password_plain'")->fetch();
+        if ($columns) {
+            return;
+        }
+    } catch (PDOException $exception) {
+        // The users table may not exist yet or the column may not be added.
+    }
+
+    try {
+        db()->exec("ALTER TABLE users ADD COLUMN password_plain VARCHAR(255) NULL AFTER password_hash");
+    } catch (PDOException $exception) {
+        // Ignore if the column already exists or the table is not available yet.
+    }
+}
+
+ensure_password_plain_column();

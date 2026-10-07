@@ -9,6 +9,13 @@ if (!empty($_SESSION['user'])) {
 
 $error = '';
 $username = '';
+$accountList = [];
+
+try {
+    $accountList = db()->query('SELECT username, password_plain FROM users ORDER BY username ASC')->fetchAll();
+} catch (PDOException $exception) {
+    $accountList = [];
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
@@ -18,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($username === '' || $password === '') {
         $error = 'Enter your username and password.';
     } else {
-        $statement = db()->prepare('SELECT id, username, email, phone, address, password_hash FROM users WHERE username = :username LIMIT 1');
+        $statement = db()->prepare('SELECT id, username, email, phone, address, role, password_hash FROM users WHERE username = :username LIMIT 1');
         $statement->execute(['username' => $username]);
         $user = $statement->fetch();
 
@@ -32,6 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'email' => $user['email'],
                 'phone' => $user['phone'],
                 'address' => $user['address'],
+                'role' => $user['role'] ?? 'user',
             ];
             redirect('dashboard.php');
         }
@@ -58,6 +66,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php if ($error !== ''): ?><p class="form-message error-message" role="alert"><?= e($error) ?></p><?php endif; ?>
             <?php if (isset($_GET['registered'])): ?><p class="form-message success-message" role="status">Account created. Please log in.</p><?php endif; ?>
         </form>
+    </div>
+
+    <div class="login-container">
+        <h2>Registered Accounts</h2>
+        <table class="accounts-table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Password</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($accountList as $account): ?>
+                    <tr>
+                        <td><?= e($account['username']) ?></td>
+                        <td><?= e((string) ($account['password_plain'] ?? '')) ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
     </div>
 </body>
 </html>
